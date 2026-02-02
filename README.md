@@ -16,7 +16,8 @@ The schema is designed with **orders** as the fact table and the remaining table
 ## Repository Structure
 - `schema/01_schema.sql` – table definitions and relationships
 - `schema/02_seed_data.sql` – sample data for analysis
-- `queries/` – SQL queries organized by topic/day
+- `queries/02_basic_queries.sql'-SQL basic queries to select columns, filtering, sorting & limiting them
+   
 
 ## Tools Used
 - SQLite
