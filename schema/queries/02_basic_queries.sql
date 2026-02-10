@@ -31,3 +31,10 @@ WHERE order_date>= '2025-03-01'
 ORDER BY total_amount DESC
 LIMIT 3;
 
+--pattern matching--
+SELECT customer_name
+FROM customers
+WHERE customer_name LIKE '%Co%';
+
+
+
