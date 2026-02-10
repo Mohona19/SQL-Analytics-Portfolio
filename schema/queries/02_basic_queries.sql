@@ -36,5 +36,76 @@ SELECT customer_name
 FROM customers
 WHERE customer_name LIKE '%Co%';
 
+--Total Revenue per customer--
+SELECT customer_id, SUM(total_amount) AS total_revenue 
+FROM orders
+GROUP BY customer_id;
 
+--Total quantity sold per product--
+SELECT
+  product_id,
+  SUM(quantity) AS total_units_sold
+FROM orders
+GROUP BY product_id;
 
+--Total revenue per sales rep--
+SELECT
+  sales_rep_id,
+  SUM(total_amount) AS total_revenue
+FROM orders
+GROUP BY sales_rep_id;
+
+--Number of orders per customer--
+SELECT
+  customer_id,
+  COUNT(*) AS order_count
+FROM orders
+GROUP BY customer_id;
+
+--Average order value per customer--
+SELECT
+  customer_id,
+  AVG(total_amount) AS avg_order_value
+FROM orders
+GROUP BY customer_id;
+
+--Customers with total revenue greater than 2000--
+SELECT
+  customer_id,
+  SUM(total_amount) AS total_revenue
+FROM orders
+GROUP BY customer_id
+HAVING SUM(total_amount) > 2000;
+
+--Products with more than 15 units sold--
+SELECT
+  product_id,
+  SUM(quantity) AS total_units_sold
+FROM orders
+GROUP BY product_id
+HAVING SUM(quantity) > 15;
+
+--Sales reps with more than 2 orders--
+SELECT
+  sales_rep_id,
+  COUNT(*) AS order_count
+FROM orders
+GROUP BY sales_rep_id
+HAVING COUNT(*) > 2;
+
+--Customers with average order value above 1000--
+SELECT
+  customer_id,
+  AVG(total_amount) AS avg_order_value
+FROM orders
+GROUP BY customer_id
+HAVING AVG(total_amount) > 1000;
+
+--High-value customers (at least 2 large orders)--
+SELECT
+  customer_id,
+  COUNT(*) AS large_order_count
+FROM orders
+WHERE total_amount > 1000
+GROUP BY customer_id
+HAVING COUNT(*) >= 2;
