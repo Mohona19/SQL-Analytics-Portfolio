@@ -1,0 +1,74 @@
+**Revenue per order, not raw columns**
+Q1: You have an orders table. Write a query that returns each order with: order_id, total_revenue (quantity × unit_price), and a revenue_tier column — "high" if revenue > 500, "medium" if 100–500, "low" otherwise.  
+Goal: compute revenue per order and bucket into tiers.
+
+SELECT
+  order_id,
+  quantity * unit_price AS total_revenue,
+  CASE
+    WHEN quantity * unit_price > 500 THEN 'high'
+    WHEN quantity * unit_price BETWEEN 100 AND 500 THEN 'medium'
+    ELSE 'low'
+  END AS revenue_tier
+FROM orders;
+
+**Filter without losing your mind on NULLs**
+Q2: From a customers table, return all customers who signed up in 2023, have a non-null email, and whose country is NOT "US" or "CA". Order by signup_date descending.  
+Goal: filter customers by signup year, non-null email, and exclude US/CA.
+
+SELECT *
+FROM customers
+WHERE signup_date >= '2023-01-01'
+  AND signup_date < '2024-01-01'
+  AND email IS NOT NULL
+  AND country NOT IN ('US', 'CA')
+ORDER BY signup_date DESC;
+
+-- Note: NOT IN also excludes NULL countries.
+
+**Monthly revenue by product** (Snowflake/PostgreSQL syntax)
+Q3: Write a query returning monthly revenue per product for 2023 only. Include: year-month (formatted as 'YYYY-MM'), product_id, total_revenue, order_count. Sort by year-month ascending, then total_revenue descending.  
+Goal: monthly revenue and order count per product for 2023.
+
+SELECT 
+  TO_CHAR(order_date, 'YYYY-MM') AS year_month,
+  product_id,
+  SUM(quantity * unit_price) AS total_revenue,
+  COUNT(*) AS order_count
+FROM orders
+WHERE order_date >= '2023-01-01'
+  AND order_date < '2024-01-01'
+GROUP BY TO_CHAR(order_date, 'YYYY-MM'), product_id
+ORDER BY year_month ASC, total_revenue DESC;
+
+**Customers with consistently high spend**
+Q4: Find customer_ids who have placed at least 3 orders in 2023 AND whose average order value is above $200. Return customer_id, order_count, avg_order_value.  
+Goal: customers with 3+ orders and average order value > $200 in 2023.
+
+SELECT 
+  customer_id,
+  COUNT(*) AS order_count,
+  AVG(quantity * unit_price) AS avg_order_value
+FROM orders
+WHERE order_date >= '2023-01-01'
+  AND order_date < '2024-01-01'
+GROUP BY customer_id
+HAVING COUNT(*) >= 3
+   AND AVG(quantity * unit_price) > 200;
+
+**Top-performing segments**
+Q5: Which customer segments generated more than $10K in revenue last quarter, and how many unique customers drove that? Assume last quarter = Q4 2023.  
+Goal: total revenue and unique customer count by segment for Q4 2023.
+
+SELECT
+  customer_segment,
+  SUM(quantity * unit_price) AS total_revenue,
+  COUNT(DISTINCT customer_id) AS unique_customers
+FROM orders
+WHERE order_date >= '2023-10-01'
+  AND order_date < '2024-01-01'
+GROUP BY customer_segment
+HAVING SUM(quantity * unit_price) > 10000
+ORDER BY total_revenue DESC;
+
+-- Assumption: customer_segment exists in the orders table.
